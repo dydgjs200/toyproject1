@@ -11,8 +11,8 @@ export class UserController {
 
   @Post('register')
   @ApiOperation({ summary: '회원가입', description: '새로운 사용자를 등록합니다.' })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: '회원가입 성공',
     schema: {
       type: 'object',
@@ -22,19 +22,21 @@ export class UserController {
           type: 'object',
           properties: {
             id: { type: 'number', example: 1 },
-            username: { type: 'string', example: 'testuser1' }
-          }
-        }
-      }
-    }
+            username: { type: 'string', example: 'testuser1' },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 409, description: '이미 존재하는 사용자명' })
-  async create(@Body() createUserDto: CreateUserDto): Promise<{ message: string; user: Omit<User, 'password'> }> {
+  async create(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<{ message: string; user: Omit<User, 'password'> }> {
     const user = await this.userService.create(createUserDto);
-    
+
     // 비밀번호를 제외한 사용자 정보 반환
     const { password, ...userWithoutPassword } = user;
-    
+
     return {
       message: '회원가입이 성공적으로 완료되었습니다.',
       user: userWithoutPassword,
@@ -42,7 +44,10 @@ export class UserController {
   }
 
   @Get('all')
-  @ApiOperation({ summary: '전체 사용자 목록 조회', description: '등록된 모든 사용자 목록을 조회합니다.' })
+  @ApiOperation({
+    summary: '전체 사용자 목록 조회',
+    description: '등록된 모든 사용자 목록을 조회합니다.',
+  })
   @ApiResponse({ status: 200, description: '사용자 목록 조회 성공', type: [User] })
   async findAll(): Promise<User[]> {
     return this.userService.findAll();
@@ -56,4 +61,4 @@ export class UserController {
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<User | null> {
     return this.userService.findOne(id);
   }
-} 
+}
