@@ -14,4 +14,4 @@ export class User {
   @ApiProperty({ description: '해시화된 비밀번호', example: '$2b$10$...' })
   @Column()
   password: string;
-} 
+}
