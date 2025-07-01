@@ -6,7 +6,7 @@ import { File } from '../../file/entities/file.entity';
 export class User {
   @ApiProperty({ description: '사용자 ID', example: 1 })
   @PrimaryGeneratedColumn()
-  id: number;
+  userId: number;
 
   @ApiProperty({ description: '사용자명', example: 'testuser1' })
   @Column({ unique: true })

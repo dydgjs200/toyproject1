@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -41,8 +41,14 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findOne(id: number): Promise<User | null> {
-    return this.userRepository.findOne({ where: { id } });
+  async findOne(userId: number): Promise<User | null> {
+    const user = await this.userRepository.findOne({ where: { userId } });
+
+    if(!user) {
+      throw new NotFoundException('해당 유저를 찾을 수 없습니다.');
+    }
+
+    return user;
   }
 
   async findByUsername(username: string): Promise<User | null> {

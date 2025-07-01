@@ -16,7 +16,7 @@ export class S3Controller {
         type: S3ClientResponseDto
     })
     async createS3Client(): Promise<S3ClientResponseDto> {
-        return await this.s3Service.createS3Client();
+        return this.s3Service.createS3ClientResponse();
     }
 
     @Get('config')
