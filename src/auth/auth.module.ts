@@ -7,7 +7,7 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
-    UserModule, // 반드시 추가!
+    UserModule,
     PassportModule,
     JwtModule.register({
       secret: 'your_jwt_secret',
