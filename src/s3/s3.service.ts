@@ -19,19 +19,23 @@ export class S3Service {
     };
   }
 
-  createS3Client(): S3ClientResponseDto {
+  // S3 클라이언트 생성
+  createS3Client(): S3Client {
     const config = this.getS3Config();
     this.logger.log('S3 클라이언트 생성됨');
     
-    const s3Client = new S3Client({
+    return new S3Client({
       region: config.region,
       credentials: {
         accessKeyId: config.accessKeyId,
         secretAccessKey: config.secretAccessKey,
       },
     });
+  }
 
-    // Swagger용 깔끔한 응답 객체 반환
+  // Swagger용 응답을 위한 별도 메서드
+  createS3ClientResponse(): S3ClientResponseDto {
+    const config = this.getS3Config();
     return {
       message: 'S3 클라이언트가 성공적으로 생성되었습니다.',
       config: {
