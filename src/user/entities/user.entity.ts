@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { File } from '../../file/entities/file.entity';
 
 @Entity()
 export class User {
@@ -15,4 +16,7 @@ export class User {
   @Column()
   password: string;
 
+  // 파일과의 관계
+  @OneToMany(() => File, file => file.user)
+  files: File[];
 }
