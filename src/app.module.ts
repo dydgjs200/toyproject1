@@ -22,7 +22,7 @@ import { S3Module } from './s3/s3.module';
       port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: 'user_db',
+      database: process.env.DB_DATABASE,
       entities: [User],
       synchronize: true, // 개발 환경에서만 true로 설정
       autoLoadEntities: true,

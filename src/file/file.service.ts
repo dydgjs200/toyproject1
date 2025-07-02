@@ -133,5 +133,13 @@ export class FileService {
             throw new NotFoundException('파일을 찾을 수 없습니다.');
         }
         return file;
-    }   
+    }
+
+    async getMyFile(userId: number) {
+        const files = await this.fileRepository.find({ where: { userId } });
+        if (!files) {
+            throw new NotFoundException('파일을 찾을 수 없습니다.');
+        }
+        return files;
+    }
 }
