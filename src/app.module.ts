@@ -26,13 +26,14 @@ import { S3Module } from './s3/s3.module';
       entities: [User],
       synchronize: true, // 개발 환경에서만 true로 설정
       autoLoadEntities: true,
+      charset: 'utf8mb4',
     }),
     UserModule,
     AuthModule,
     FileModule,
     S3Module,
   ],
-  controllers: [AppController, FileController],
-  providers: [AppService, FileService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
