@@ -17,21 +17,28 @@ export class FileService {
     ) {}
 
     async uploadFile(file: Express.Multer.File, userId: number) {
-        // 파일 확인
-        if (!file) {
-            throw new BadRequestException('파일이 첨부되어야 합니다.');
-        }
-        // 사용자 확인
-        const user = await this.userService.findOne(userId);
-        if (!user) throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
+
+        //파일 유무 확인
+        if(file === undefined) throw new BadRequestException('파일이 없습니다.');
 
         const uuid = uuidv4();
         const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
         const extension = originalName.split('.').pop();
-        const s3Key = `uploads/user_${userId}/${uuid}.${extension}`;
-        const s3Url = this.s3Service.generateS3Url(s3Key);
+        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'exe', 'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'iso', 'dmg', 'img', 'wim', 'cab', 'arj', 'lzh', 'lha', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha']
+
+        // 사용자 확인
+        const user = await this.userService.findOne(userId);
+        if (!user) throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
+
+        // 확장자 확인
+        if (!allowedExtensions.includes(extension || '')) {
+            throw new BadRequestException('허용되지 않은 파일 확장자입니다.');
+        }
+
 
         // S3 업로드
+        const s3Key = `uploads/user_${userId}/${uuid}.${extension}`;
+        const s3Url = this.s3Service.generateS3Url(s3Key);
         const s3Client = this.s3Service.createS3Client();
         const s3Config = this.s3Service.getS3Config();
 
