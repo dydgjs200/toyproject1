@@ -22,7 +22,8 @@ export class FileService {
         if (!user) throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
 
         const uuid = uuidv4();
-        const extension = file.originalname.split('.').pop();
+        const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+        const extension = originalName.split('.').pop();
         const s3Key = `uploads/user_${userId}/${uuid}.${extension}`;
         const s3Url = this.s3Service.generateS3Url(s3Key);
 
@@ -39,7 +40,7 @@ export class FileService {
         // DB 저장
         const fileEntity = this.fileRepository.create({
             uuid,
-            originalName: file.originalname,
+            originalName,
             s3Key,
             s3Url,
             userId,
