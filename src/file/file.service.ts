@@ -1,5 +1,5 @@
 import { ListObjectsV2Command, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { S3Service } from 'src/s3/s3.service';
 import { UserService } from 'src/user/user.service';
@@ -17,6 +17,10 @@ export class FileService {
     ) {}
 
     async uploadFile(file: Express.Multer.File, userId: number) {
+        // 파일 확인
+        if (!file) {
+            throw new BadRequestException('파일이 첨부되어야 합니다.');
+        }
         // 사용자 확인
         const user = await this.userService.findOne(userId);
         if (!user) throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
@@ -36,6 +40,7 @@ export class FileService {
             Key: s3Key,
             Body: file.buffer,
         }));
+
 
         // DB 저장
         const fileEntity = this.fileRepository.create({

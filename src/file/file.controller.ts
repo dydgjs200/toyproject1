@@ -34,6 +34,10 @@ export class FileController {
         type: UploadFileResponseDto,
     })
     @ApiResponse({
+        status: 400,
+        description: '파일이 첨부되어야 합니다.',
+    })
+    @ApiResponse({
         status: 404,
         description: '사용자를 찾을 수 없습니다.',
     })
