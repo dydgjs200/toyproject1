@@ -9,6 +9,14 @@ dotenv.config({ path: '.env' });
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // cors 설정
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  });
+  app.enableCors();
+
   // Swagger 설정
   const config = new DocumentBuilder()
     .setTitle('File Upload Application API')
