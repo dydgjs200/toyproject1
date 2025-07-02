@@ -1,9 +1,9 @@
 import { Controller, Post, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiExcludeController } from '@nestjs/swagger';
 import { S3Service } from './s3.service';
 import { S3ClientResponseDto } from './dto/s3-response.dto';
 
-@ApiTags('S3 관리')
+@ApiExcludeController()
 @Controller('s3')
 export class S3Controller {
     constructor(private readonly s3Service: S3Service) {}

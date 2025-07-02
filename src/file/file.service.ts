@@ -24,16 +24,11 @@ export class FileService {
         const uuid = uuidv4();
         const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
         const extension = originalName.split('.').pop();
-        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'exe', 'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'iso', 'dmg', 'img', 'wim', 'cab', 'arj', 'lzh', 'lha', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha', 'lzh', 'lzx', 'arc', 'cab', 'uue', 'bin', 'hqx', 'mime', 'base64', 'bin', 'dat', 'dms', 'lha']
 
         // 사용자 확인
         const user = await this.userService.findOne(userId);
         if (!user) throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
 
-        // 확장자 확인
-        if (!allowedExtensions.includes(extension || '')) {
-            throw new BadRequestException('허용되지 않은 파일 확장자입니다.');
-        }
 
 
         // S3 업로드
@@ -155,4 +150,6 @@ export class FileService {
         }
         return files;
     }
+
+
 }
