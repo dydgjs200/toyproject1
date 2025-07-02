@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, Delete, Put } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
 @ApiTags('users')
@@ -43,7 +44,25 @@ export class UserController {
     };
   }
 
-  @Get('all')
+  @Delete(':userId')
+  @ApiOperation({ summary: '사용자 삭제', description: 'ID로 특정 사용자를 삭제합니다.' })
+  @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
+  @ApiResponse({ status: 200, description: '사용자 삭제 성공' })
+  @ApiResponse({ status: 404, description: '사용자를 찾을 수 없음' })
+  async delete(@Param('userId', ParseIntPipe) userId: number): Promise<void> {
+    return this.userService.delete(userId);
+  }
+
+  @Put(':userId')
+  @ApiOperation({ summary: '사용자 수정', description: 'ID로 특정 사용자를 수정합니다.' })
+  @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
+  @ApiResponse({ status: 200, description: '사용자 수정 성공' })
+  @ApiResponse({ status: 404, description: '사용자를 찾을 수 없음' })
+  async update(@Param('userId', ParseIntPipe) userId: number, @Body() updateUserDto: UpdateUserDto): Promise<void> {
+    return this.userService.update(userId, updateUserDto);
+  } 
+
+  @Get('getAllUser')
   @ApiOperation({
     summary: '전체 사용자 목록 조회',
     description: '등록된 모든 사용자 목록을 조회합니다.',
@@ -53,12 +72,13 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
+  @Get(':userId')
   @ApiOperation({ summary: '특정 사용자 조회', description: 'ID로 특정 사용자를 조회합니다.' })
-  @ApiParam({ name: 'id', description: '사용자 ID', example: 1 })
+  @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
   @ApiResponse({ status: 200, description: '사용자 조회 성공', type: User })
   @ApiResponse({ status: 404, description: '사용자를 찾을 수 없음' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<User | null> {
+  async findOne(@Param('userId', ParseIntPipe) id: number): Promise<User | null> {
     return this.userService.findOne(id);
   }
+
 }

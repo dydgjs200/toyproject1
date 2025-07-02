@@ -1,67 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../user/entities/user.entity';
 
 @Entity()
 export class File {
-  @ApiProperty({ description: '파일 ID', example: 1 })
   @PrimaryGeneratedColumn()
-  id: number;
+  fileId: number;             // 자동 증가하는 내부 ID (API에서 사용)
 
-  @ApiProperty({ description: '원본 파일명', example: 'document.pdf' })
+  @Column({ unique: true })
+  uuid: string;           // S3에 저장된 uuid
+
   @Column()
-  originalName: string;
+  originalName: string;   // 원본 파일명
 
-  @ApiProperty({ description: 'S3에 저장된 파일명', example: 'uuid-document.pdf' })
   @Column()
-  fileName: string;
+  s3Key: string;          // S3 Key (uploads/user_{userId}/uuid.확장자)
 
-  @ApiProperty({ description: '파일 크기 (bytes)', example: 1024000 })
-  @Column('bigint')
-  fileSize: number;
-
-  @ApiProperty({ description: '파일 MIME 타입', example: 'application/pdf' })
   @Column()
-  mimeType: string;
+  s3Url: string;          // S3 URL
 
-  @ApiProperty({ description: 'S3 버킷 URL', example: 'https://bucket.s3.region.amazonaws.com/file.pdf' })
   @Column()
-  s3Url: string;
-
-  @ApiProperty({ description: 'S3 버킷명', example: 'my-file-bucket' })
-  @Column()
-  bucketName: string;
-
-  @ApiProperty({ description: 'S3 키', example: 'uploads/user1/document.pdf' })
-  @Column()
-  s3Key: string;
-
-  @ApiProperty({ description: '파일 설명', example: '중요한 문서입니다.' })
-  @Column({ nullable: true })
-  description: string;
-
-  @ApiProperty({ description: '파일 카테고리', example: 'document' })
-  @Column({ nullable: true })
-  category: string;
-
-  @ApiProperty({ description: '파일 공개 여부', example: false })
-  @Column({ default: false })
-  isPublic: boolean;
-
-  @ApiProperty({ description: '파일 만료일', example: '2024-12-31' })
-  @Column({ nullable: true })
-  expiresAt: Date;
+  userId: number;         // 업로더
 
   @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  // 사용자와의 관계
-  @ManyToOne(() => User, user => user.files, { onDelete: 'CASCADE' })
-  user: User;
-
-  @Column()
-  userId: number;
-} 
+  createdAt: Date;        // 업로드 일시
+}

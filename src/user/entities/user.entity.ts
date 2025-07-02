@@ -17,6 +17,6 @@ export class User {
   password: string;
 
   // 파일과의 관계
-  @OneToMany(() => File, file => file.user)
+  @OneToMany(() => File, file => file.userId)
   files: File[];
 }
