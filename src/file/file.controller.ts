@@ -104,4 +104,16 @@ export class FileController {
     async getFile(@Param('fileId') fileId: number) {
         return this.fileService.getFile(fileId);
     }
+
+    @Get('getMyFile/:userId')
+    @ApiOperation({summary: '내 파일 조회'})
+    @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
+    @ApiResponse({
+        status: 200,
+        description: '내 파일 조회 성공',
+        type: [FileDto],
+    })
+    async getMyFile(@Param('userId') userId: number) {
+        return this.fileService.getMyFile(userId);
+    }
 }
