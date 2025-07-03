@@ -95,7 +95,14 @@ export class FileController {
         type: [FileDto],
     })
     async getAllFile() {
-        return this.fileService.getAllFile();
+        const files = await this.fileService.getAllFile();
+        return files.map(file => ({
+            fileId: file.fileId,
+            s3Url: file.url,
+            originalName: file.originalName,
+            userId: file.userId,
+            createdAt: file.createdAt,
+        }));
     }
 
     @Get('getFile/:fileId')

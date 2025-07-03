@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class FileDto {
     @ApiProperty({ description: '파일 ID', example: 1 })
-    id: number;
+    fileId: number;
 
     @ApiProperty({ description: 'S3 URL', example: 'https://bucket.s3.region.amazonaws.com/uploads/user_1/uuid.jpg' })
     url: string;
@@ -25,7 +25,7 @@ export class UploadFileResponseDto {
     message: string;
 
     @ApiProperty({ description: '파일 ID', example: 1 })
-    id: number;
+    fileId: number;
 
     @ApiProperty({ description: 'S3 URL', example: 'https://bucket.s3.region.amazonaws.com/uploads/user_1/uuid.jpg' })
     url: string;
