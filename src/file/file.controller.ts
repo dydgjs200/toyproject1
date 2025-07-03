@@ -1,9 +1,10 @@
-import { Controller, Post, UseInterceptors, UploadedFile, Body, Get, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, Body, Get, Param, Delete, Res, UsePipes } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import { ApiOperation, ApiResponse, ApiTags, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FileDto, UploadFileResponseDto } from './dto/file.dto';
+
 
 @ApiTags('file')
 @Controller('file')
@@ -120,4 +121,5 @@ export class FileController {
     async getMyFile(@Param('userId') userId: number) {
         return this.fileService.getMyFile(userId);
     }
+
 }
