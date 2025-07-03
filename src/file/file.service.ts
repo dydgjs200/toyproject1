@@ -151,4 +151,42 @@ export class FileService {
         }
         return files;
     }
+
+    async uploadPdfBufferToS3(pdfBuffer: Buffer, originalName: string, userId: number) {
+        const uuid = uuidv4();
+        const extension = originalName.split('.').pop();
+        const s3Key = `uploads/user_${userId}/${uuid}.${extension}`;
+        const s3Client = this.s3Service.createS3Client();
+        const s3Config = this.s3Service.getS3Config();
+
+        // S3 업로드
+        await s3Client.send(new PutObjectCommand({
+            Bucket: s3Config.bucketName,
+            Key: s3Key,
+            Body: pdfBuffer,
+            ContentType: 'application/pdf',
+        }));
+
+        const s3Url = this.s3Service.generateS3Url(s3Key);
+
+        // DB 저장 (file upload와 동일)
+        const fileEntity = this.fileRepository.create({
+            uuid,
+            originalName,
+            s3Key,
+            s3Url,
+            userId,
+        });
+        const savedFile = await this.fileRepository.save(fileEntity);
+
+        return {
+            fileId: savedFile.fileId,
+            uuid,
+            originalName,
+            s3Key,
+            s3Url,
+            userId,
+            createdAt: savedFile.createdAt,
+        };
+    }
 }
