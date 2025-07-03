@@ -3,6 +3,7 @@ import { ConvertService } from './convert.service';
 import { ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { FileService } from 'src/file/file.service';
 import { PdfUploadResponseDto } from 'src/file/dto/pdf-upload-response.dto';
+import { WordToPdfDto } from './dto/word-to-pdf.dto';
 
 @Controller('convert')
 export class ConvertController {
@@ -11,8 +12,8 @@ export class ConvertController {
     @Post('wordToPdf')
     @ApiOperation({ summary: 'Word 파일을 PDF로 변환 후 S3 저장' })
     @ApiOkResponse({ type: PdfUploadResponseDto, description: '변환된 PDF 파일의 S3 저장 정보' })
-    async wordToPdf(@Body('fileId') fileId: number, @Body('userId') userId: number): Promise<PdfUploadResponseDto> {
-        // 파일 경로 예외처리
+    async wordToPdf(@Body() body: WordToPdfDto): Promise<PdfUploadResponseDto> {
+        const { fileId, userId } = body;
         if (!fileId) throw new BadRequestException('fileId가 필요합니다.');
         if (!userId) throw new BadRequestException('userId가 필요합니다.');
 
