@@ -7,7 +7,6 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "postbuild": "mkdir dist\\converter\\fonts 2>nul & copy src\\converter\\fonts\\NotoSansKR-Regular.ttf dist\\converter\\fonts\\NotoSansKR-Regular.ttf",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
