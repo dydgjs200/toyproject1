@@ -10,6 +10,9 @@ import { FileController } from './file/file.controller';
 import { FileService } from './file/file.service';
 import { FileModule } from './file/file.module';
 import { S3Module } from './s3/s3.module';
+import { ConvertController } from './convert/convert.controller';
+import { ConvertService } from './convert/convert.service';
+import { ConvertModule } from './convert/convert.module';
 
 @Module({
   imports: [
@@ -32,8 +35,9 @@ import { S3Module } from './s3/s3.module';
     AuthModule,
     FileModule,
     S3Module,
+    ConvertModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, ConvertController],
+  providers: [AppService, ConvertService],
 })
 export class AppModule {}

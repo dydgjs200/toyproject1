@@ -223,3 +223,188 @@ $ npm run test:cov
 ## 라이선스
 
 MIT licensed.
+
+# AI를 활용한 WORD to PDF 변환 API
+
+NestJS 기반의 AI 파일 변환 서비스입니다. WORD 문서를 PDF로 변환할 때 AI 기반 최적화를 적용합니다.
+
+## 주요 기능
+
+- 🤖 **AI 기반 최적화**: 텍스트 품질 향상, 이미지 최적화, 메타데이터 정리
+- 📄 **다양한 형식 지원**: .doc, .docx 파일 변환
+- ⚡ **품질 설정**: low, medium, high 품질 옵션
+- 📦 **배치 처리**: 최대 10개 파일 동시 변환
+- 👀 **미리보기**: Base64 인코딩된 PDF 미리보기
+- 📊 **상태 확인**: 변환기 상태 및 지원 기능 확인
+
+## 설치 방법
+
+### 1. 의존성 설치
+
+```bash
+npm install
+```
+
+### 2. LibreOffice 설치 (필수)
+
+#### Windows
+1. [LibreOffice 공식 사이트](https://www.libreoffice.org/download/download/)에서 다운로드
+2. 설치 후 시스템 환경변수 PATH에 추가
+3. 또는 설치 경로를 직접 지정 (예: `C:\Program Files\LibreOffice\program\soffice.exe`)
+
+#### macOS
+```bash
+brew install --cask libreoffice
+```
+
+#### Ubuntu/Debian
+```bash
+sudo apt-get install libreoffice
+```
+
+### 3. 환경 변수 설정
+
+`.env` 파일에 데이터베이스 설정을 추가하세요:
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_DATABASE=your_database
+```
+
+## 사용 방법
+
+### 서버 실행
+
+```bash
+npm run start:dev
+```
+
+### API 엔드포인트
+
+#### 1. 단일 파일 변환
+```http
+POST /converter/word-to-pdf
+Content-Type: multipart/form-data
+
+file: [WORD 파일]
+quality: low|medium|high (선택사항)
+```
+
+#### 2. 배치 변환
+```http
+POST /converter/batch-word-to-pdf
+Content-Type: multipart/form-data
+
+files: [WORD 파일들] (최대 10개)
+```
+
+#### 3. 변환 상태 확인
+```http
+GET /converter/status
+```
+
+#### 4. PDF 미리보기
+```http
+POST /converter/preview
+Content-Type: multipart/form-data
+
+file: [WORD 파일]
+```
+
+## AI 최적화 기능
+
+### 텍스트 최적화
+- OCR 품질 향상
+- 텍스트 재구성 및 스타일 통일
+- 폰트 최적화
+
+### 이미지 최적화
+- 해상도 조정
+- 압축 최적화
+- 색상 보정
+
+### 메타데이터 정리
+- 문서 정보 정리
+- 보안 정보 제거
+- 표준화된 메타데이터 적용
+
+## 품질 설정
+
+- **Low**: 파일 크기 최소화, 기본 변환
+- **Medium**: 균형잡힌 품질과 크기 (기본값)
+- **High**: 최고 품질, 고해상도 처리
+
+## 예제 사용법
+
+### cURL 예제
+
+```bash
+# 단일 파일 변환
+curl -X POST http://localhost:3000/converter/word-to-pdf \
+  -F "file=@document.docx" \
+  -F "quality=high" \
+  --output converted.pdf
+
+# 배치 변환
+curl -X POST http://localhost:3000/converter/batch-word-to-pdf \
+  -F "files=@doc1.docx" \
+  -F "files=@doc2.docx"
+```
+
+### JavaScript 예제
+
+```javascript
+// 단일 파일 변환
+const formData = new FormData();
+formData.append('file', fileInput.files[0]);
+formData.append('quality', 'high');
+
+fetch('/converter/word-to-pdf', {
+  method: 'POST',
+  body: formData
+})
+.then(response => response.blob())
+.then(blob => {
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'converted.pdf';
+  a.click();
+});
+```
+
+## 문제 해결
+
+### LibreOffice 관련 오류
+1. LibreOffice가 올바르게 설치되었는지 확인
+2. 시스템 PATH에 LibreOffice 경로가 추가되었는지 확인
+3. Windows의 경우 설치 경로를 직접 지정:
+
+```typescript
+// converter.service.ts에서
+const libreofficePath = 'C:\\Program Files\\LibreOffice\\program\\soffice.exe';
+```
+
+### 메모리 부족 오류
+- 큰 파일 변환 시 메모리 부족이 발생할 수 있습니다
+- 품질을 'low'로 설정하거나 파일 크기를 줄여보세요
+
+### 변환 실패
+- 지원되는 형식(.doc, .docx)인지 확인
+- 파일이 손상되지 않았는지 확인
+- 로그를 확인하여 구체적인 오류 메시지 확인
+
+## 개발 환경
+
+- Node.js 18+
+- NestJS 11+
+- TypeScript
+- MySQL
+- LibreOffice
+
+## 라이선스
+
+MIT License
