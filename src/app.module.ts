@@ -13,7 +13,6 @@ import { S3Module } from './s3/s3.module';
 import { ConvertController } from './convert/convert.controller';
 import { ConvertService } from './convert/convert.service';
 import { ConvertModule } from './convert/convert.module';
-import { CloudConvertModule } from './cloudconvert/cloudconvert.module';
 
 @Module({
   imports: [
@@ -37,7 +36,6 @@ import { CloudConvertModule } from './cloudconvert/cloudconvert.module';
     FileModule,
     S3Module,
     ConvertModule,
-    CloudConvertModule,
   ],
   controllers: [AppController, ConvertController],
   providers: [AppService, ConvertService],
