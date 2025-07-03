@@ -57,10 +57,28 @@ export class UserService {
   }
 
   async delete(userId: number): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { userId } });
+
+    if(!user) {
+      throw new NotFoundException('해당 유저를 찾을 수 없습니다.');
+    }
+
     await this.userRepository.delete(userId);
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { userId } });
+
+    if(!user) {
+      throw new NotFoundException('해당 유저를 찾을 수 없습니다.');
+    }
+
+    if(updateUserDto.password) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, saltRounds);
+      updateUserDto.password = hashedPassword;
+    }
+
     await this.userRepository.update(userId, updateUserDto);
   }
   

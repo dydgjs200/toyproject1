@@ -32,7 +32,7 @@ export class UserController {
   })
   @ApiResponse({ status: 409, description: '이미 존재하는 사용자명' })
   async create(
-    @Body(RegisterValidationPipe) createUserDto: CreateUserDto,
+    @Body() createUserDto: CreateUserDto,
   ): Promise<{ message: string; user: Omit<User, 'password'> }> {
     const user = await this.userService.create(createUserDto);
 
@@ -46,7 +46,7 @@ export class UserController {
   }
 
   @Delete(':userId')
-  @ApiOperation({ summary: '사용자 삭제', description: 'ID로 특정 사용자를 삭제합니다.' })
+  @ApiOperation({ summary: '사용자 탈퇴', description: 'ID로 사용자가 탈퇴됩니다.' })
   @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
   @ApiResponse({ status: 200, description: '사용자 삭제 성공' })
   @ApiResponse({ status: 404, description: '사용자를 찾을 수 없음' })
@@ -54,12 +54,13 @@ export class UserController {
     return this.userService.delete(userId);
   }
 
+  // 사용자 등록과 동일한 유효성 검증 필요
   @Put(':userId')
   @ApiOperation({ summary: '사용자 수정', description: 'ID로 특정 사용자를 수정합니다.' })
   @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
   @ApiResponse({ status: 200, description: '사용자 수정 성공' })
   @ApiResponse({ status: 404, description: '사용자를 찾을 수 없음' })
-  async update(@Param('userId', ParseIntPipe) userId: number, @Body() updateUserDto: UpdateUserDto): Promise<void> {
+  async update(@Param('userId') userId: number, @Body(RegisterValidationPipe) updateUserDto: UpdateUserDto): Promise<void> {
     return this.userService.update(userId, updateUserDto);
   } 
 
