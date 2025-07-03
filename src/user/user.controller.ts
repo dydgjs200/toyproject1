@@ -4,6 +4,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { RegisterValidationPipe } from 'src/common/user/register-validation.pipe';
 
 @ApiTags('users')
 @Controller('users')
@@ -31,7 +32,7 @@ export class UserController {
   })
   @ApiResponse({ status: 409, description: '이미 존재하는 사용자명' })
   async create(
-    @Body() createUserDto: CreateUserDto,
+    @Body(RegisterValidationPipe) createUserDto: CreateUserDto,
   ): Promise<{ message: string; user: Omit<User, 'password'> }> {
     const user = await this.userService.create(createUserDto);
 

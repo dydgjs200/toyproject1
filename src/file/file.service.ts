@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { File } from './entities/file.entity';
+const docxConverter = require('docx-pdf');
 
 @Injectable()
 export class FileService {
@@ -150,6 +151,4 @@ export class FileService {
         }
         return files;
     }
-
-
 }
