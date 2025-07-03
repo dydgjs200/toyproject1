@@ -57,7 +57,7 @@ export class FileService {
 
         return { 
             message: '업로드 성공', 
-            id: savedFile.fileId,
+            fileId: savedFile.fileId,
             url: s3Url, 
             uuid: savedFile.uuid
         };
@@ -121,14 +121,14 @@ export class FileService {
         return { message: '파일 삭제 성공' };
     }
 
-    async getAllFile(): Promise<{ id: number; url: string; originalName: string; userId: number; createdAt: Date }[]> {
+    async getAllFile(): Promise<{ fileId: number; url: string; originalName: string; userId: number; createdAt: Date }[]> {
         // DB에서 모든 파일 정보 조회
         const files = await this.fileRepository.find({
             order: { createdAt: 'DESC' }
         });
 
         return files.map(file => ({
-            id: file.fileId,
+            fileId: file.fileId,
             url: file.s3Url,
             originalName: file.originalName,
             userId: file.userId,
