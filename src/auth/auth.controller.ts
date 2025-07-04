@@ -1,7 +1,8 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginDto } from './dto/auth.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -39,6 +40,7 @@ export class AuthController {
       type: 'object',
     }
   })
+  @UseGuards(JwtAuthGuard)
   async logout(@Body() body: { username: string; password: string }) {
     return {message: '로그아웃 성공. 클라이언트에서 토큰 삭제'}
   }
