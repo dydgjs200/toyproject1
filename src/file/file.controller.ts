@@ -10,7 +10,6 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @Controller('file')
 export class FileController {
     constructor(private readonly fileService: FileService) {}
-
     @Post('upload')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
@@ -50,8 +49,6 @@ export class FileController {
     })
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file: Express.Multer.File, @Body('userId') userId: number, @Request() req) {
-        console.log("토큰 사용자 아이디 >", req.user.sub, typeof req.user.sub)
-        console.log("사용자 아이디 >", userId, typeof userId)
         // 토큰의 사용자 ID와 요청의 사용자 ID가 일치하는지 확인
         if (req.user.sub.toString() !== userId.toString()) {
             throw new UnauthorizedException('자신의 파일만 업로드할 수 있습니다.');

@@ -16,7 +16,7 @@ export class ConvertController {
     @UseGuards(JwtAuthGuard)
     async wordToPdf(@Body() body: WordToPdfDto): Promise<PdfUploadResponseDto> {
         const { fileId, userId } = body;
-        if (!fileId) throw new BadRequestException('fileId가 필요합니다.');
+        if (!fileId) throw new BadRequestException('fileId가 필요합니다.');     
         if (!userId) throw new BadRequestException('userId가 필요합니다.');
 
         // fileId로 파일 조회

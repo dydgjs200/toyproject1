@@ -4,21 +4,19 @@ import { IsString, IsNotEmpty, MinLength } from 'class-validator';
 export class CreateUserDto {
   @ApiProperty({
     description: '사용자명',
-    example: 'testuser1',
+    example: 'testuser',
     minLength: 3,
+    maxLength: 8,
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(3)
   username: string;
 
   @ApiProperty({
     description: '비밀번호',
-    example: 'password123',
-    minLength: 6,
+    example: '@password123',
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(6)
   password: string;
 }
