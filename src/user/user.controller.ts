@@ -79,7 +79,7 @@ export class UserController {
   } 
 
   @Get('getAllUser')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard) 
   @ApiBearerAuth()
   @ApiOperation({
     summary: '전체 사용자 목록 조회',
@@ -94,7 +94,6 @@ export class UserController {
   }
 
   @Get(':userId')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '특정 사용자 조회', description: 'ID로 특정 사용자를 조회합니다.' })
   @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
