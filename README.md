@@ -1,410 +1,290 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# File Upload & Conversion API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS 기반의 파일 업로드 및 변환 API 서비스입니다. 사용자 인증, 파일 관리, S3 저장소 연동, 그리고 Word to PDF 변환 기능을 제공합니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 주요 기능
 
-## Description
+### 🔐 인증 시스템
+- JWT 기반 사용자 인증
+- 회원가입/로그인/로그아웃
+- 비밀번호 해시화 (bcrypt)
+- 보안된 API 엔드포인트
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 📁 파일 관리
+- 파일 업로드 (S3 저장)
+- 파일 다운로드
+- 파일 조회 (전체/개인/단일)
+- 파일 삭제
+- 본인 파일만 접근 가능한 보안 제어
 
-## Project setup
+### 🔄 파일 변환
+- Word 문서를 PDF로 변환
+- 변환된 PDF를 S3에 자동 저장
+- LibreOffice 기반 변환 엔진
 
-```bash
-$ npm install
+### 📊 일관된 API 응답
+- 모든 API 응답이 표준화된 형태
+- `{ status, description, data, timestamp }` 구조
+- 스웨거 문서와 실제 응답 일치
+
+## 🛠 기술 스택
+
+### Backend
+- **Framework**: NestJS 11.0.1
+- **Language**: TypeScript 5.7.3
+- **Database**: MySQL (TypeORM)
+- **Authentication**: JWT, Passport
+- **File Storage**: AWS S3
+- **Documentation**: Swagger/OpenAPI
+- **Validation**: class-validator, class-transformer
+
+### 주요 라이브러리
+- `@aws-sdk/client-s3`: AWS S3 클라이언트
+- `bcryptjs`: 비밀번호 해시화
+- `docx-pdf`: Word to PDF 변환
+- `multer`: 파일 업로드 처리
+- `pdf-lib`: PDF 처리
+
+## 📁 프로젝트 구조
+
+```
+src/
+├── auth/                    # 인증 모듈
+│   ├── dto/                # 인증 관련 DTO
+│   ├── guards/             # JWT 가드
+│   ├── auth.controller.ts  # 인증 컨트롤러
+│   ├── auth.service.ts     # 인증 서비스
+│   └── auth.module.ts      # 인증 모듈
+├── user/                   # 사용자 모듈
+│   ├── dto/                # 사용자 관련 DTO
+│   ├── entities/           # 사용자 엔티티
+│   ├── user.controller.ts  # 사용자 컨트롤러
+│   ├── user.service.ts     # 사용자 서비스
+│   └── user.module.ts      # 사용자 모듈
+├── file/                   # 파일 모듈
+│   ├── dto/                # 파일 관련 DTO
+│   ├── entities/           # 파일 엔티티
+│   ├── file.controller.ts  # 파일 컨트롤러
+│   ├── file.service.ts     # 파일 서비스
+│   └── file.module.ts      # 파일 모듈
+├── convert/                # 변환 모듈
+│   ├── dto/                # 변환 관련 DTO
+│   ├── convert.controller.ts # 변환 컨트롤러
+│   ├── convert.service.ts  # 변환 서비스
+│   └── convert.module.ts   # 변환 모듈
+├── s3/                     # S3 모듈
+│   ├── dto/                # S3 관련 DTO
+│   ├── s3.controller.ts    # S3 컨트롤러
+│   ├── s3.service.ts       # S3 서비스
+│   └── s3.module.ts        # S3 모듈
+├── common/                 # 공통 모듈
+│   ├── dto/                # 공통 DTO
+│   ├── decorators/         # 커스텀 데코레이터
+│   ├── filters/            # 예외 필터
+│   ├── interceptors/       # 응답 인터셉터
+│   ├── pipe/               # 커스텀 파이프
+│   └── common.module.ts    # 공통 모듈
+└── main.ts                 # 애플리케이션 진입점
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-
-# Toy Project 1 - User Management System
-
-NestJS와 MySQL을 사용한 사용자 관리 시스템입니다.
-
-## 기능
-
-- 사용자 회원가입 (비밀번호 해시화)
-- 사용자 목록 조회
-- 사용자 상세 조회
-
-## 기술 스택
-
-- **Backend**: NestJS
-- **Database**: MySQL
-- **ORM**: TypeORM
-- **Password Hashing**: bcryptjs
-
-## 프로젝트 설정
-
-### 1. 의존성 설치
-
-```bash
-$ npm install
-```
-
-### 2. MySQL 데이터베이스 설정
-
-1. MySQL 서버가 실행 중인지 확인하세요.
-2. `toyproject1_db` 데이터베이스를 생성하세요:
-
-```sql
-CREATE DATABASE toyproject1_db;
-```
-
-3. `src/app.module.ts` 파일에서 데이터베이스 연결 정보를 수정하세요:
-
-```typescript
-TypeOrmModule.forRoot({
-  type: 'mysql',
-  host: 'localhost',
-  port: 3306,
-  username: 'root',
-  password: 'your_password', // 실제 MySQL 비밀번호로 변경
-  database: 'toyproject1_db',
-  entities: [User],
-  synchronize: true, // 개발 환경에서만 true로 설정
-  autoLoadEntities: true,
-}),
-```
-
-### 3. 애플리케이션 실행
-
-```bash
-# 개발 모드
-$ npm run start:dev
-
-# 프로덕션 모드
-$ npm run start:prod
-```
-
-## API 엔드포인트
-
-### 회원가입
-```http
-POST /users
-Content-Type: application/json
-
-{
-  "username": "testuser",
-  "password": "password123"
-}
-```
-
-**응답:**
-```json
-{
-  "message": "회원가입이 성공적으로 완료되었습니다.",
-  "user": {
-    "id": 1,
-    "username": "testuser"
-  }
-}
-```
-
-### 사용자 목록 조회
-```http
-GET /users
-```
-
-### 특정 사용자 조회
-```http
-GET /users/:id
-```
-
-## 데이터베이스 스키마
+## 🗄 데이터베이스 스키마
 
 ### User 테이블
 ```sql
 CREATE TABLE user (
-  id INT PRIMARY KEY AUTO_INCREMENT,
+  userId INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL
 );
 ```
 
-## 보안 기능
-
-- 비밀번호는 bcryptjs를 사용하여 해시화되어 저장됩니다.
-- 사용자명은 중복을 방지하기 위해 UNIQUE 제약조건이 설정되어 있습니다.
-
-## 테스트
-
-```bash
-# 단위 테스트
-$ npm run test
-
-# e2e 테스트
-$ npm run test:e2e
-
-# 테스트 커버리지
-$ npm run test:cov
+### File 테이블
+```sql
+CREATE TABLE file (
+  fileId INT PRIMARY KEY AUTO_INCREMENT,
+  uuid VARCHAR(255) UNIQUE NOT NULL,
+  originalName VARCHAR(255) NOT NULL,
+  s3Key VARCHAR(255) NOT NULL,
+  s3Url VARCHAR(500) NOT NULL,
+  userId INT NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES user(userId) ON DELETE CASCADE
+);
 ```
 
-## 라이선스
+## 🔧 설치 및 실행
 
-MIT licensed.
-
-# AI를 활용한 WORD to PDF 변환 API
-
-NestJS 기반의 AI 파일 변환 서비스입니다. WORD 문서를 PDF로 변환할 때 AI 기반 최적화를 적용합니다.
-
-## 주요 기능
-
-- 🤖 **AI 기반 최적화**: 텍스트 품질 향상, 이미지 최적화, 메타데이터 정리
-- 📄 **다양한 형식 지원**: .doc, .docx 파일 변환
-- ⚡ **품질 설정**: low, medium, high 품질 옵션
-- 📦 **배치 처리**: 최대 10개 파일 동시 변환
-- 👀 **미리보기**: Base64 인코딩된 PDF 미리보기
-- 📊 **상태 확인**: 변환기 상태 및 지원 기능 확인
-
-## 설치 방법
-
-### 1. 의존성 설치
-
+### 1. 환경 설정
 ```bash
+# 의존성 설치
 npm install
-```
 
-### 2. LibreOffice 설치 (필수)
-
-#### Windows
-1. [LibreOffice 공식 사이트](https://www.libreoffice.org/download/download/)에서 다운로드
-2. 설치 후 시스템 환경변수 PATH에 추가
-3. 또는 설치 경로를 직접 지정 (예: `C:\Program Files\LibreOffice\program\soffice.exe`)
-
-#### macOS
-```bash
-brew install --cask libreoffice
-```
-
-#### Ubuntu/Debian
-```bash
-sudo apt-get install libreoffice
-```
-
-### 3. 환경 변수 설정
-
-`.env` 파일에 데이터베이스 설정을 추가하세요:
-
-```env
+# 환경 변수 설정 (.env 파일 생성)
 DB_HOST=localhost
 DB_PORT=3306
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_DATABASE=your_database
+JWT_SECRET=your_jwt_secret
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_REGION=your_aws_region
+AWS_S3_BUCKET=your_s3_bucket
+CORS_ORIGIN=http://localhost:3000
+PORT=3000
 ```
 
-## 사용 방법
-
-### 서버 실행
-
+### 2. 데이터베이스 설정
 ```bash
+# MySQL 데이터베이스 생성
+CREATE DATABASE your_database;
+```
+
+### 3. 애플리케이션 실행
+```bash
+# 개발 모드
 npm run start:dev
+
+# 프로덕션 빌드
+npm run build
+npm run start:prod
 ```
 
-### API 엔드포인트
+## 📚 API 문서
 
-#### 1. 단일 파일 변환
-```http
-POST /converter/word-to-pdf
-Content-Type: multipart/form-data
-
-file: [WORD 파일]
-quality: low|medium|high (선택사항)
+### Swagger UI
+애플리케이션 실행 후 다음 URL에서 API 문서를 확인할 수 있습니다:
+```
+http://localhost:3000/api
 ```
 
-#### 2. 배치 변환
-```http
-POST /converter/batch-word-to-pdf
-Content-Type: multipart/form-data
+### 주요 API 엔드포인트
 
-files: [WORD 파일들] (최대 10개)
+#### 인증 (Auth)
+- `POST /auth/login` - 로그인
+- `POST /auth/logout` - 로그아웃
+
+#### 사용자 (Users)
+- `POST /users/register` - 회원가입
+- `DELETE /users/:userId` - 사용자 탈퇴
+- `PUT /users/:userId` - 사용자 정보 수정
+- `GET /users/getAllUser` - 전체 사용자 조회
+- `GET /users/:userId` - 특정 사용자 조회
+
+#### 파일 (Files)
+- `POST /file/upload` - 파일 업로드
+- `GET /file/download/:fileId` - 파일 다운로드
+- `DELETE /file/delete/:fileId` - 파일 삭제
+- `GET /file/getAllFile` - 전체 파일 조회
+- `GET /file/getFile/:fileId` - 단일 파일 조회
+- `GET /file/getMyFile/:userId` - 내 파일 조회
+
+#### 변환 (Convert)
+- `POST /convert/wordToPdf` - Word to PDF 변환
+
+## 🔒 보안 기능
+
+### 인증 및 권한
+- JWT 토큰 기반 인증
+- 비밀번호 bcrypt 해시화
+- 본인 파일만 접근 가능한 제어
+- API 엔드포인트별 인증 가드 적용
+
+### 파일 보안
+- 파일 소유자 확인 로직
+- S3 접근 권한 제어
+- 안전한 파일 업로드 처리
+
+## 📊 API 응답 형식
+
+### 성공 응답
+```json
+{
+  "status": 200,
+  "description": "요청이 성공적으로 처리되었습니다.",
+  "data": {
+    // 실제 데이터
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
 ```
 
-#### 3. 변환 상태 확인
-```http
-GET /converter/status
+### 에러 응답
+```json
+{
+  "status": 400,
+  "description": "잘못된 요청입니다.",
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
 ```
 
-#### 4. PDF 미리보기
-```http
-POST /converter/preview
-Content-Type: multipart/form-data
-
-file: [WORD 파일]
-```
-
-## AI 최적화 기능
-
-### 텍스트 최적화
-- OCR 품질 향상
-- 텍스트 재구성 및 스타일 통일
-- 폰트 최적화
-
-### 이미지 최적화
-- 해상도 조정
-- 압축 최적화
-- 색상 보정
-
-### 메타데이터 정리
-- 문서 정보 정리
-- 보안 정보 제거
-- 표준화된 메타데이터 적용
-
-## 품질 설정
-
-- **Low**: 파일 크기 최소화, 기본 변환
-- **Medium**: 균형잡힌 품질과 크기 (기본값)
-- **High**: 최고 품질, 고해상도 처리
-
-## 예제 사용법
-
-### cURL 예제
+## 🧪 테스트
 
 ```bash
-# 단일 파일 변환
-curl -X POST http://localhost:3000/converter/word-to-pdf \
-  -F "file=@document.docx" \
-  -F "quality=high" \
-  --output converted.pdf
+# 단위 테스트
+npm run test
 
-# 배치 변환
-curl -X POST http://localhost:3000/converter/batch-word-to-pdf \
-  -F "files=@doc1.docx" \
-  -F "files=@doc2.docx"
+# E2E 테스트
+npm run test:e2e
+
+# 테스트 커버리지
+npm run test:cov
 ```
 
-### JavaScript 예제
+## 🚀 배포
 
-```javascript
-// 단일 파일 변환
-const formData = new FormData();
-formData.append('file', fileInput.files[0]);
-formData.append('quality', 'high');
+### Docker (권장)
+```bash
+# Docker 이미지 빌드
+docker build -t file-upload-api .
 
-fetch('/converter/word-to-pdf', {
-  method: 'POST',
-  body: formData
-})
-.then(response => response.blob())
-.then(blob => {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'converted.pdf';
-  a.click();
-});
+# 컨테이너 실행
+docker run -p 3000:3000 file-upload-api
 ```
 
-## 문제 해결
+### 직접 배포
+```bash
+# 프로덕션 빌드
+npm run build
 
-### LibreOffice 관련 오류
-1. LibreOffice가 올바르게 설치되었는지 확인
-2. 시스템 PATH에 LibreOffice 경로가 추가되었는지 확인
-3. Windows의 경우 설치 경로를 직접 지정:
-
-```typescript
-// converter.service.ts에서
-const libreofficePath = 'C:\\Program Files\\LibreOffice\\program\\soffice.exe';
+# 프로덕션 실행
+npm run start:prod
 ```
 
-### 메모리 부족 오류
-- 큰 파일 변환 시 메모리 부족이 발생할 수 있습니다
-- 품질을 'low'로 설정하거나 파일 크기를 줄여보세요
+## 📝 개발 가이드
 
-### 변환 실패
-- 지원되는 형식(.doc, .docx)인지 확인
-- 파일이 손상되지 않았는지 확인
-- 로그를 확인하여 구체적인 오류 메시지 확인
+### 새로운 API 추가
+1. 컨트롤러에 엔드포인트 추가
+2. 서비스 로직 구현
+3. DTO 정의 (필요시)
+4. 스웨거 문서 작성
+5. 테스트 코드 작성
 
-## 개발 환경
+### 데이터베이스 마이그레이션
+```bash
+# TypeORM CLI 사용
+npx typeorm migration:generate
+npx typeorm migration:run
+```
 
-- Node.js 18+
-- NestJS 11+
-- TypeScript
-- MySQL
-- LibreOffice
+## 🤝 기여하기
 
-## 라이선스
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-MIT License
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+## 📞 문의
+
+프로젝트에 대한 문의사항이 있으시면 이슈를 생성해 주세요.
+
+---
+
+**개발자**: [Your Name]  
+**버전**: 0.0.1  
+**최종 업데이트**: 2024년 1월 
