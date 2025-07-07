@@ -100,10 +100,22 @@ export class FileController {
         description: '인증이 필요합니다.',
     })
     @ApiResponse({
+        status: 403,
+        description: '자신의 파일만 삭제할 수 있습니다.',
+    })
+    @ApiResponse({
         status: 404,
         description: '파일을 찾을 수 없습니다.',
     })
-    async deleteFile(@Param('fileId') fileId: number) {
+    async deleteFile(@Param('fileId') fileId: number, @Request() req) {
+        // 파일 정보 조회
+        const file = await this.fileService.getFile(fileId);
+        
+        // 토큰의 사용자 ID와 파일의 사용자 ID가 일치하는지 확인
+        if (req.user.sub !== file.userId) {
+            throw new UnauthorizedException('자신의 파일만 삭제할 수 있습니다.');
+        }
+        
         return this.fileService.deleteFile(fileId);
     }
 
@@ -145,8 +157,23 @@ export class FileController {
         status: 401,
         description: '인증이 필요합니다.',
     })
-    async getFile(@Param('fileId') fileId: number) {
-        return this.fileService.getFile(fileId);
+    @ApiResponse({
+        status: 403,
+        description: '자신의 파일만 조회할 수 있습니다.',
+    })
+    @ApiResponse({
+        status: 404,
+        description: '파일을 찾을 수 없습니다.',
+    })
+    async getFile(@Param('fileId') fileId: number, @Request() req) {
+        const file = await this.fileService.getFile(fileId);
+        
+        // 토큰의 사용자 ID와 파일의 사용자 ID가 일치하는지 확인
+        if (req.user.sub !== file.userId) {
+            throw new UnauthorizedException('자신의 파일만 조회할 수 있습니다.');
+        }
+        
+        return file;
     }
 
     @Get('getMyFile/:userId')
