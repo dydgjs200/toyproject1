@@ -17,11 +17,31 @@ export class AuthController {
     description: '로그인 성공',
     schema: {
       type: 'object',
+      properties: {
+        status: { type: 'number', example: 201 },
+        description: { type: 'string', example: '로그인 성공' },
+        data: {
+          type: 'object',
+          properties: {
+            access_token: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
+            userId: { type: 'number', example: 1 }
+          }
+        },
+        timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+      }
     }
   })
   @ApiResponse({
     status: 401,
     description: '아이디 또는 비밀번호가 올바르지 않습니다.',
+    schema: {
+      type: 'object',
+      properties: {
+        status: { type: 'number', example: 401 },
+        description: { type: 'string', example: '아이디 또는 비밀번호가 올바르지 않습니다.' },
+        timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+      }
+    }
   })
   async login(@Body() body: { username: string; password: string }) {
     const user = await this.authService.validateUser(body.username, body.password);
@@ -38,6 +58,29 @@ export class AuthController {
     description: '로그아웃 성공',
     schema: {
       type: 'object',
+      properties: {
+        status: { type: 'number', example: 201 },
+        description: { type: 'string', example: '로그아웃 성공' },
+        data: {
+          type: 'object',
+          properties: {
+            message: { type: 'string', example: '로그아웃 성공. 클라이언트에서 토큰 삭제' }
+          }
+        },
+        timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증이 필요합니다.',
+    schema: {
+      type: 'object',
+      properties: {
+        status: { type: 'number', example: 401 },
+        description: { type: 'string', example: '인증이 필요합니다.' },
+        timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+      }
     }
   })
   @UseGuards(JwtAuthGuard)
