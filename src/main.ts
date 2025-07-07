@@ -2,6 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
+import { ApiResponseDto, ErrorResponseDto } from './common/dto/api-response.dto';
+import { UploadFileResponseDto, FileDto } from './file/dto/file.dto';
+import { PdfUploadResponseDto } from './file/dto/pdf-upload-response.dto';
+import { LoginDto } from './auth/dto/auth.dto';
+import { CreateUserDto } from './user/dto/create-user.dto';
+import { UpdateUserDto } from './user/dto/update-user.dto';
+import { User } from './user/entities/user.entity';
 
 // .env 파일 로드
 dotenv.config({ path: '.env' });
@@ -25,7 +32,19 @@ async function bootstrap() {
     .addTag('users', '사용자 관련 API')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [
+      ApiResponseDto, 
+      ErrorResponseDto, 
+      UploadFileResponseDto, 
+      FileDto, 
+      PdfUploadResponseDto,
+      LoginDto,
+      CreateUserDto,
+      UpdateUserDto,
+      User
+    ],
+  });
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
