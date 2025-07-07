@@ -79,7 +79,11 @@ export class FileController {
             }
         }
     })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: {
+            fileSize: 1024 * 1024 * 100, // 100MB 제한
+        },
+    }))
     async uploadFile(@UploadedFile() file: Express.Multer.File, @Body('userId') userId: number, @Request() req) {
         // 토큰의 사용자 ID와 요청의 사용자 ID가 일치하는지 확인
         if (req.user.sub.toString() !== userId.toString()) {
