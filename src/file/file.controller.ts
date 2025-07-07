@@ -141,6 +141,108 @@ export class FileController {
         res.send(fileData.buffer);
     }
 
+    @Get('download-info/:fileId')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({summary: '파일 다운로드 정보 조회'})
+    @ApiParam({ name: 'fileId', description: '파일 ID', example: 1 })
+    @ApiResponse({
+        status: 200,
+        description: '파일 다운로드 정보 조회 성공',
+        schema: {
+            type: 'object',
+            properties: {
+                status: { type: 'number', example: 200 },
+                description: { type: 'string', example: '파일 다운로드 정보 조회 성공' },
+                data: {
+                    type: 'object',
+                    properties: {
+                        fileId: { type: 'number', example: 1 },
+                        originalName: { type: 'string', example: '테스트파일.pdf' },
+                        contentType: { type: 'string', example: 'application/pdf' },
+                        downloadUrl: { type: 'string', example: '/file/download/1' },
+                        fileSize: { type: 'number', example: 1024 }
+                    }
+                },
+                timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+            }
+        }
+    })
+    @ApiResponse({
+        status: 401,
+        description: '인증이 필요합니다.',
+        schema: {
+            type: 'object',
+            properties: {
+                status: { type: 'number', example: 401 },
+                description: { type: 'string', example: '인증이 필요합니다.' },
+                timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+            }
+        }
+    })
+    @ApiResponse({
+        status: 403,
+        description: '자신의 파일만 조회할 수 있습니다.',
+        schema: {
+            type: 'object',
+            properties: {
+                status: { type: 'number', example: 403 },
+                description: { type: 'string', example: '자신의 파일만 조회할 수 있습니다.' },
+                timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+            }
+        }
+    })
+    @ApiResponse({
+        status: 404,
+        description: '파일을 찾을 수 없습니다.',
+        schema: {
+            type: 'object',
+            properties: {
+                status: { type: 'number', example: 404 },
+                description: { type: 'string', example: '파일을 찾을 수 없습니다.' },
+                timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+            }
+        }
+    })
+    async getDownloadInfo(@Param('fileId') fileId: number, @Request() req) {
+        // 파일 정보 조회
+        const file = await this.fileService.getFile(fileId);
+        
+        // 토큰의 사용자 ID와 파일의 사용자 ID가 일치하는지 확인
+        if (req.user.sub !== file.userId) {
+            throw new UnauthorizedException('자신의 파일만 조회할 수 있습니다.');
+        }
+
+        // 파일 다운로드 정보 반환
+        return {
+            fileId: file.fileId,
+            originalName: file.originalName,
+            contentType: this.getContentType(file.originalName),
+            downloadUrl: `/file/download/${fileId}`,
+            fileSize: 0 // 실제 파일 크기는 S3에서 조회해야 함
+        };
+    }
+
+    private getContentType(filename: string): string {
+        const extension = filename.split('.').pop()?.toLowerCase();
+        const contentTypes: { [key: string]: string } = {
+            'pdf': 'application/pdf',
+            'doc': 'application/msword',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'txt': 'text/plain',
+            'json': 'application/json',
+            'xml': 'application/xml',
+            'csv': 'text/csv',
+            'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xls': 'application/vnd.ms-excel'
+        };
+        return contentTypes[extension || ''] || 'application/octet-stream';
+    }
+
     @Delete('delete/:fileId')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
