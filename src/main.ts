@@ -23,7 +23,6 @@ async function bootstrap() {
     credentials: true,
     exposedHeaders: ['Content-Disposition'],
   });
-  app.enableCors();
 
   // Swagger 설정
   const config = new DocumentBuilder()
