@@ -9,6 +9,7 @@ import { LoginDto } from './auth/dto/auth.dto';
 import { CreateUserDto } from './user/dto/create-user.dto';
 import { UpdateUserDto } from './user/dto/update-user.dto';
 import { User } from './user/entities/user.entity';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 // .env 파일 로드
 dotenv.config({ path: '.env' });
@@ -31,6 +32,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('users', '사용자 관련 API')
     .build();
+
+  // 예외 처리 시, filter를 통해 응답 형식을 지정
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [
