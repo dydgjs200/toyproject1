@@ -1,8 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
-import { ApiResponseDto, ErrorResponseDto } from './common/dto/api-response.dto';
 import { UploadFileResponseDto, FileDto } from './file/dto/file.dto';
 import { PdfUploadResponseDto } from './file/dto/pdf-upload-response.dto';
 import { LoginDto } from './auth/dto/auth.dto';
@@ -31,15 +30,21 @@ async function bootstrap() {
     .setDescription('파일 업로드 어플리케이션')
     .setVersion('1.0')
     .addTag('users', '사용자 관련 API')
+    .addBearerAuth()
     .build();
+
+  // swagger token 유지 설정
+  const customOptions: SwaggerCustomOptions = {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  };
 
   // 예외 처리 시, filter를 통해 응답 형식을 지정
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [
-      ApiResponseDto, 
-      ErrorResponseDto, 
       UploadFileResponseDto, 
       FileDto, 
       PdfUploadResponseDto,
@@ -49,7 +54,7 @@ async function bootstrap() {
       User
     ],
   });
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, customOptions);
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(`애플리케이션이 http://localhost:${process.env.PORT ?? 3000}에서 실행 중입니다.`);
