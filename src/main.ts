@@ -9,6 +9,7 @@ import { CreateUserDto } from './user/dto/create-user.dto';
 import { UpdateUserDto } from './user/dto/update-user.dto';
 import { User } from './user/entities/user.entity';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 // .env 파일 로드
 dotenv.config({ path: '.env' });
@@ -55,6 +56,9 @@ async function bootstrap() {
     ],
   });
   SwaggerModule.setup('api', app, document, customOptions);
+
+  // 전역 validation pipe 설정
+  app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(`애플리케이션이 http://localhost:${process.env.PORT ?? 3000}에서 실행 중입니다.`);

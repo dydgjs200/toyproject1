@@ -12,11 +12,8 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: '로그인', description: '사용자 로그인' })
   @ApiBody({type: LoginDto})
-  async login(@Body() body: { username: string; password: string }) {
-    const user = await this.authService.validateUser(body.username, body.password);
-    if (!user) {
-      throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.');
-    }
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.authService.validateUser(loginDto.username, loginDto.password);
     return this.authService.login(user);
   }
 
