@@ -1,5 +1,5 @@
 import { ListObjectsV2Command, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { S3Service } from 'src/s3/s3.service';
 import { UserService } from 'src/user/user.service';
@@ -17,10 +17,11 @@ export class FileService {
         private readonly fileRepository: Repository<File>,
     ) {}
 
-    async uploadFile(file: Express.Multer.File, userId: number) {
+    private readonly logger = new Logger(FileService.name, {timestamp: true});
 
+    async uploadFile(file: Express.Multer.File, userId: number) {
         //파일 유무 확인
-        if(file === undefined) throw new BadRequestException('파일이 없습니다.');
+        //if(file === undefined) throw new BadRequestException('파일이 없습니다.');
 
         const uuid = uuidv4();
         const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
@@ -28,9 +29,8 @@ export class FileService {
 
         // 사용자 확인
         const user = await this.userService.findOne(userId);
-        if (!user) throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
 
-
+        this.logger.log(`file Upload 사용자 확인 완료`);
 
         // S3 업로드
         const s3Key = `uploads/user_${userId}/${uuid}.${extension}`;

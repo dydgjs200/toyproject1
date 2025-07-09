@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsDate, IsNumber, IsString } from 'class-validator';
 
 export class FileDto {
     @ApiProperty({ description: '파일 ID', example: 1 })
     @IsNumber()
+    @Type(() => Number)
     fileId: number;
 
     @ApiProperty({ description: 'S3 URL', example: 'https://bucket.s3.region.amazonaws.com/uploads/user_1/uuid.jpg' })
@@ -20,6 +22,7 @@ export class FileDto {
 
     @ApiProperty({ description: '업로더 ID', example: 1 })
     @IsNumber()
+    @Type(() => Number)
     userId: number;
 
     @ApiProperty({ description: '업로드 일시', example: '2024-01-01T00:00:00.000Z' })

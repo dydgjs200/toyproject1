@@ -1,11 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { FileService } from 'src/file/file.service';
 import axios from 'axios';
 import * as FormData from 'form-data';
 
 @Injectable()
 export class ConvertService {
-    private readonly API_KEY = process.env.CLOUDCONVERT_API_KEY; // CloudConvert API Key를 입력하세요
+    private readonly API_KEY = process.env.CLOUDCONVERT_API_KEY;
+
+    private readonly logger = new Logger(ConvertService.name, {timestamp: true});
 
     async wordToPdfJobCreate(buffer: Buffer, filename: string): Promise<Buffer> {
       // 1. Job 생성
@@ -38,6 +40,8 @@ export class ConvertService {
       const importTask = createJobRes.data.data.tasks.find(t => t.name === 'import-my-file');
       const uploadUrl = importTask.result.form.url;
       const uploadParams = importTask.result.form.parameters;
+
+      this.logger.log(`CloudConvert Job 생성 완료: ${jobId}`);
   
       // 2. 파일 업로드 (buffer 사용)
       const form = new FormData();
@@ -46,6 +50,8 @@ export class ConvertService {
   
       await axios.post(uploadUrl, form, { headers: form.getHeaders() });
   
+      this.logger.log(`CloudConvert 파일 업로드 완료`);
+
       // 3. 변환 완료 대기
       let exportTask;
       while (true) {
@@ -57,10 +63,15 @@ export class ConvertService {
         if (exportTask.status === 'error') throw new BadRequestException('CloudConvert 변환 실패');
         await new Promise(res => setTimeout(res, 2000));
       }
+
+      this.logger.log(`CloudConvert 변환 완료`);
   
       // 4. PDF 다운로드
       const fileUrl = exportTask.result.files[0].url;
       const pdfRes = await axios.get(fileUrl, { responseType: 'arraybuffer' });
+
+      this.logger.log(`CloudConvert PDF 다운로드 완료`);
+
       return Buffer.from(pdfRes.data);
     }
   
@@ -96,6 +107,8 @@ export class ConvertService {
       );
   
       const jobId = createJobRes.data.data.id;
+
+      this.logger.log(`S3 Job 생성 완료: ${jobId}`);
   
       // 2. 변환 완료 대기
       let exportTask;
@@ -112,6 +125,9 @@ export class ConvertService {
       // 3. PDF 다운로드
       const pdfUrl = exportTask.result.files[0].url;
       const pdfRes = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
+
+      this.logger.log(`S3 -> PDF 다운로드 완료`);
+
       return Buffer.from(pdfRes.data);
     }
 }

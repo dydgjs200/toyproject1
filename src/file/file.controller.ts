@@ -4,6 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags, ApiConsumes, ApiBody, ApiParam, Api
 import { Response } from 'express';
 import { FileDto, UploadFileResponseDto } from './dto/file.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('file')
 @Controller('file')
@@ -14,6 +15,7 @@ export class FileController {
     @ApiBearerAuth()
     @ApiOperation({summary: '파일 업로드'})
     @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile(new ParseFilePipe({
         validators: [
             new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 100 }), // 파일 검증 및 100MB 제한
@@ -85,11 +87,6 @@ export class FileController {
     async deleteFile(@Param('fileId', ParseIntPipe) fileId: number, @Request() req) {
         // 파일 정보 조회
         const file = await this.fileService.getFile(fileId);
-        
-        // 토큰의 사용자 ID와 파일의 사용자 ID가 일치하는지 확인
-        if (req.user.sub !== file.userId) {
-            throw new UnauthorizedException('자신의 파일만 삭제할 수 있습니다.');
-        }
         
         return this.fileService.deleteFile(fileId);
     }
