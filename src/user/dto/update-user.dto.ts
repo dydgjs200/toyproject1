@@ -10,6 +10,5 @@ export class UpdateUserDto {
   @ApiProperty({ description: '비밀번호', example: 'newpassword123', required: false })
   @IsOptional()
   @IsString()
-  @MinLength(6)
   password?: string;
 }

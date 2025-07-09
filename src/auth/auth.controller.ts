@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 
 @ApiTags('auth')
 @Controller('auth')

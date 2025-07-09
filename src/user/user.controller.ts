@@ -15,7 +15,7 @@ export class UserController {
   @Post('register')
   @ApiOperation({ summary: '회원가입', description: '새로운 사용자를 등록합니다.' })
   async create(
-    @Body() createUserDto: CreateUserDto,
+    @Body(RegisterValidationPipe) createUserDto: CreateUserDto,
   ): Promise<{ message: string; user: Omit<User, 'password'> }> {
     const user = await this.userService.create(createUserDto);
 
@@ -34,10 +34,6 @@ export class UserController {
   @ApiOperation({ summary: '사용자 탈퇴', description: 'ID로 사용자가 탈퇴됩니다.' })
   @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
   async delete(@Param('userId', ParseIntPipe) userId: number, @Request() req): Promise<void> {
-    // 토큰의 사용자 ID와 요청의 사용자 ID가 일치하는지 확인
-    if (req.user.sub !== userId) {
-      throw new UnauthorizedException('자신의 계정만 삭제할 수 있습니다.');
-    }
     return this.userService.delete(userId);
   }
 
@@ -46,11 +42,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '사용자 수정', description: 'ID로 특정 사용자를 수정합니다.' })
   @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
-  async update(@Param('userId') userId: number, @Body(RegisterValidationPipe) updateUserDto: UpdateUserDto, @Request() req): Promise<void> {
-    // 토큰의 사용자 ID와 요청의 사용자 ID가 일치하는지 확인
-    if (req.user.sub !== userId) {
-      throw new UnauthorizedException('자신의 계정만 수정할 수 있습니다.');
-    }
+  async update(@Param('userId', ParseIntPipe) userId: number, @Body(RegisterValidationPipe) updateUserDto: UpdateUserDto, @Request() req): Promise<void> {
     return this.userService.update(userId, updateUserDto);
   } 
 
