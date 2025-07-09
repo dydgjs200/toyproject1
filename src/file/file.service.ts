@@ -20,8 +20,6 @@ export class FileService {
     private readonly logger = new Logger(FileService.name, {timestamp: true});
 
     async uploadFile(file: Express.Multer.File, userId: number) {
-        //파일 유무 확인
-        //if(file === undefined) throw new BadRequestException('파일이 없습니다.');
 
         const uuid = uuidv4();
         const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');

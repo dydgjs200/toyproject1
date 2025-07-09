@@ -30,6 +30,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       403: '접근 권한이 없습니다.',
       404: '요청한 리소스를 찾을 수 없습니다.',
       409: '리소스 충돌이 발생했습니다.',
+      429: 'API 호출 횟수가 너무 많습니다.',
       500: '서버 내부 오류가 발생했습니다.',
     };
   
