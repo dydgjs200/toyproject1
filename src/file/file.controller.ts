@@ -15,6 +15,24 @@ export class FileController {
     @ApiBearerAuth()
     @ApiOperation({summary: '파일 업로드'})
     @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                    description: '업로드 파일'
+                },
+                userId:{
+                    type: 'integer',
+                    description: '유저 ID',
+                    example: 1
+                }
+            },
+            required: ['file', 'userId']
+        }
+    })
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile(new ParseFilePipe({
         validators: [

@@ -1,5 +1,5 @@
 import { ListObjectsV2Command, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { S3Service } from 'src/s3/s3.service';
 import { UserService } from 'src/user/user.service';
@@ -27,6 +27,10 @@ export class FileService {
 
         // 사용자 확인
         const user = await this.userService.findOne(userId);
+
+        if(!user){
+            throw new UnauthorizedException('유저 인증이 필요합니다')
+        }
 
         this.logger.log(`file Upload 사용자 확인 완료`);
 
