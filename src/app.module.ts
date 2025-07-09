@@ -6,20 +6,26 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
-import { FileController } from './file/file.controller';
-import { FileService } from './file/file.service';
 import { FileModule } from './file/file.module';
 import { S3Module } from './s3/s3.module';
 import { ConvertController } from './convert/convert.controller';
 import { ConvertService } from './convert/convert.service';
 import { ConvertModule } from './convert/convert.module';
 import { CommonModule } from './common/common.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,   // ms단위 60초
+        limit: 10,    // 10번 요청 가능
+      },
+    ]),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -40,6 +46,9 @@ import { CommonModule } from './common/common.module';
     CommonModule,
   ],
   controllers: [AppController, ConvertController],
-  providers: [AppService, ConvertService],
+  providers: [AppService, ConvertService, {
+    provide: APP_GUARD,
+    useClass: ThrottlerGuard,
+  }],
 })
 export class AppModule {}
