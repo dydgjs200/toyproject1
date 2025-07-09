@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UnauthorizedException, UseGuards, UseFilters } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, UseGuards, UseFilters, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginDto } from './dto/auth.dto';
@@ -14,6 +14,11 @@ export class AuthController {
   @ApiBody({type: LoginDto})
   async login(@Body() loginDto: LoginDto) {
     const user = await this.authService.validateUser(loginDto.username, loginDto.password);
+
+    if(!user){
+      throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.');
+    }
+
     return this.authService.login(user);
   }
 
