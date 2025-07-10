@@ -1,8 +1,10 @@
-import { Controller, Post, Body, UnauthorizedException, UseGuards, UseFilters, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, UseGuards, UseFilters, ValidationPipe, NotFoundException, UsePipes } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AuthInvalidPasswordException, AuthUserNotFoundException } from './auth.exception';
+import { error } from 'console';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -12,14 +14,19 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: '로그인', description: '사용자 로그인' })
   @ApiBody({type: LoginDto})
+  @UsePipes(new ValidationPipe())
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.authService.validateUser(loginDto.username, loginDto.password);
-
-    if(!user){
-      throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.');
+    try{
+      const user = await this.authService.validateUser(loginDto.username, loginDto.password);
+      return this.authService.login(user);
+    }catch(error){
+      if (error instanceof AuthUserNotFoundException)
+        throw new NotFoundException(error.message)
+      if (error instanceof AuthInvalidPasswordException)
+        throw new UnauthorizedException(error.message)
     }
 
-    return this.authService.login(user);
+    throw error
   }
 
   @Post('logout')

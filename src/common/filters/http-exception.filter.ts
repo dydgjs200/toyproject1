@@ -10,15 +10,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
     const exceptionResponse = exception.getResponse()
-    
-
-    console.log("exception Res > ", exceptionResponse)
-    console.log(exceptionResponse["message"])
 
     let message = ''
 
+    // 컨트롤러에서 지정된 예외가 있을 시 리턴
+    // 없다면 지정된 discription 리턴
+    // new ValidationPipe 사용 시 message가 배열로 리턴되므로 처리 (ex. login)
     if (exceptionResponse["message"] !== null){
-      message = exceptionResponse["message"]
+      if (exceptionResponse["message"].length !== 1){
+        message = exceptionResponse["message"]
+      }
+      else{
+        message = exceptionResponse["message"][0]
+      }
     }else{
       message = this.getDescription(status)
     }

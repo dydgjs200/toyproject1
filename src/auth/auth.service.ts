@@ -3,6 +3,7 @@ import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/user/entities/user.entity';
+import { AuthUserNotFoundException, AuthInvalidPasswordException } from './auth.exception'
 
 @Injectable()
 export class AuthService {
@@ -13,19 +14,23 @@ export class AuthService {
 
     private readonly logger = new Logger(AuthService.name, {timestamp: true});
 
-    //Omit<T,k> = T타입에서 k 제외 리턴턴
-    async validateUser(username: string, password: string): Promise<Omit<User, 'password'> | null> {
+    //Omit<T,k> = T타입에서 k 제외 리턴
+    async validateUser(username: string, password: string): Promise<Omit<User, 'password'>> {
         const user = await this.userService.findByUsername(username);
+        console.log("val user > ", user)
 
-        if(user && await bcrypt.compare(password, user.password)) {
-            const { password, ...result } = user;
-            console.log("result >", result)
-            this.logger.log(`${username} 로그인 성공`);
-
-            return result;
+        if (!user) {
+          throw new AuthUserNotFoundException();
         }
-        this.logger.log(`로그인 실패`);
-        return null;
+        if (!(await bcrypt.compare(password, user.password))) {
+          throw new AuthInvalidPasswordException();
+        }
+
+        const { password: _, ...result } = user;
+
+        console.log("result > ", password, result, user)
+
+        return result as Omit<User, 'password'>;
     }
 
     // 로그인 성공 시 token 발급
