@@ -13,6 +13,7 @@ import { ConvertService } from './convert/convert.service';
 import { ConvertModule } from './convert/convert.module';
 import { CommonModule } from './common/common.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottleProxyGuard } from './common/guard/throttler-proxy.guard'
 import { APP_GUARD } from '@nestjs/core';
 
 @Module({
@@ -22,8 +23,8 @@ import { APP_GUARD } from '@nestjs/core';
     }),
     ThrottlerModule.forRoot([
       {
-        ttl: 60000,   // ms단위 60초
-        limit: 10,    // 10번 요청 가능
+        ttl: 10000,   // ms단위 1초
+        limit: 3,    // 10번 요청 가능
       },
     ]),
     TypeOrmModule.forRoot({
@@ -48,7 +49,7 @@ import { APP_GUARD } from '@nestjs/core';
   controllers: [AppController, ConvertController],
   providers: [AppService, ConvertService, {
     provide: APP_GUARD,
-    useClass: ThrottlerGuard,
+    useClass: ThrottleProxyGuard,
   }],
 })
 export class AppModule {}

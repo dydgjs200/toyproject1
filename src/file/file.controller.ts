@@ -5,11 +5,12 @@ import { Response } from 'express';
 import { FileDto, UploadFileResponseDto } from './dto/file.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {UserService} from '../user/user.service'
 
 @ApiTags('file')
 @Controller('file')
 export class FileController {
-    constructor(private readonly fileService: FileService) {}
+    constructor(private readonly fileService: FileService, private readonly userService: UserService) {}
     @Post('upload')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
@@ -38,7 +39,8 @@ export class FileController {
         validators: [
             new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 100 }), // 파일 검증 및 100MB 제한
         ],
-    })) file: Express.Multer.File, @Body('userId', ParseIntPipe) userId: number) {
+    })) file: Express.Multer.File, @Body('userId', ParseIntPipe) userId: number, @Request() req) {
+
         return this.fileService.uploadFile(file, userId);
     }
 
@@ -103,8 +105,11 @@ export class FileController {
     @ApiOperation({summary: '파일 삭제'})
     @ApiParam({ name: 'fileId', description: '파일 ID', example: 1 })
     async deleteFile(@Param('fileId', ParseIntPipe) fileId: number, @Request() req) {
-        // 파일 정보 조회
         const file = await this.fileService.getFile(fileId);
+
+        if (req.user.sub !== file.userId){
+            throw new UnauthorizedException('파일 삭제 권한이 없습니다.')
+        }
         
         return this.fileService.deleteFile(fileId);
     }
@@ -141,6 +146,8 @@ export class FileController {
     @ApiOperation({summary: '내 파일 조회'})
     @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
     async getMyFile(@Param('userId', ParseIntPipe) userId: number, @Request() req) {
+        const myFile = await this.fileService.getMyFile(userId)
+
         return this.fileService.getMyFile(userId);
     }
 }
