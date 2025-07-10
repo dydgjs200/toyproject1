@@ -1,11 +1,14 @@
-import { Controller, Post, UseInterceptors, UploadedFile, Body, Get, Param, Delete, Res, UsePipes, UseGuards, Request, UnauthorizedException, ParseFilePipe, MaxFileSizeValidator, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, Body, Get, Param, Delete, Res, UsePipes, UseGuards, Request, UnauthorizedException, ParseFilePipe, MaxFileSizeValidator, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { FileService } from './file.service';
 import { ApiOperation, ApiResponse, ApiTags, ApiConsumes, ApiBody, ApiParam, ApiBearerAuth, getSchemaPath } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FileDto, UploadFileResponseDto } from './dto/file.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {UserService} from '../user/user.service'
+import {UserService} from '../user/user.service';
+import {FileDeleteException, FileNotFoundException} from '../file/file.exception';
+import {UserNotFoundException} from '../user/user.exception'
+import {S3FileNotFoundException} from '../s3/s3.exception'
 
 @ApiTags('file')
 @Controller('file')
@@ -40,8 +43,12 @@ export class FileController {
             new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 100 }), // 파일 검증 및 100MB 제한
         ],
     })) file: Express.Multer.File, @Body('userId', ParseIntPipe) userId: number, @Request() req) {
-
-        return this.fileService.uploadFile(file, userId);
+        try{
+            return this.fileService.uploadFile(file, userId);
+        }catch(error){
+            if(error instanceof UserNotFoundException)
+                throw new NotFoundException(error.message)
+        }
     }
 
     @Get('download/:fileId')
@@ -50,14 +57,21 @@ export class FileController {
     @ApiOperation({summary: '파일 다운로드'})
     @ApiParam({ name: 'fileId', description: '파일 ID', example: 1 })
     async downloadFile(@Param('fileId', ParseIntPipe) fileId: number, @Res() res: Response) {
-        const fileData = await this.fileService.downloadFile(fileId);
+        try{
+            const fileData = await this.fileService.downloadFile(fileId);
         
-        res.set({
-            'Content-Type': fileData.contentType,
-            'Content-Disposition': `attachment; filename="${encodeURIComponent(fileData.originalName)}"`,
-        });
-        
-        res.send(fileData.buffer);
+            res.set({
+                'Content-Type': fileData.contentType,
+                'Content-Disposition': `attachment; filename="${encodeURIComponent(fileData.originalName)}"`,
+            });
+            
+            res.send(fileData.buffer);
+        }catch(error){
+            if (error instanceof FileNotFoundException)
+                throw new NotFoundException(error.message)
+            if (error instanceof S3FileNotFoundException)
+                throw new NotFoundException(error.message)
+        }
     }
 
     @Get('download-info/:fileId')
@@ -105,13 +119,14 @@ export class FileController {
     @ApiOperation({summary: '파일 삭제'})
     @ApiParam({ name: 'fileId', description: '파일 ID', example: 1 })
     async deleteFile(@Param('fileId', ParseIntPipe) fileId: number, @Request() req) {
-        const file = await this.fileService.getFile(fileId);
-
-        if (req.user.sub !== file.userId){
-            throw new UnauthorizedException('파일 삭제 권한이 없습니다.')
+        try{
+            return this.fileService.deleteFile(fileId);
+        }catch(error){
+            if(error instanceof FileNotFoundException){
+                throw new NotFoundException(error.message)
+            }
         }
         
-        return this.fileService.deleteFile(fileId);
     }
 
     @Get('getAllFile')
@@ -135,9 +150,13 @@ export class FileController {
     @ApiOperation({summary: '단일 파일 조회'})
     @ApiParam({ name: 'fileId', description: '파일 ID', example: 1 })
     async getFile(@Param('fileId', ParseIntPipe) fileId: number, @Request() req) {
-        const file = await this.fileService.getFile(fileId);
+        try{
+            const file = await this.fileService.getFile(fileId);
         
-        return file;
+            return file;
+        }catch(error){
+            
+        }
     }
 
     @Get('getMyFile/:userId')
@@ -146,8 +165,12 @@ export class FileController {
     @ApiOperation({summary: '내 파일 조회'})
     @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
     async getMyFile(@Param('userId', ParseIntPipe) userId: number, @Request() req) {
-        const myFile = await this.fileService.getMyFile(userId)
+        try{
+            const myFile = await this.fileService.getMyFile(userId)
 
-        return this.fileService.getMyFile(userId);
+            return this.fileService.getMyFile(userId);
+        }catch(error){
+
+        }
     }
 }
