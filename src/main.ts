@@ -20,6 +20,10 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'verbose', 'debug'],
   });
 
+  // 프록시 신뢰
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
+
   // cors 설정
   app.enableCors({
     origin: process.env.CORS_ORIGIN ?? "*",
