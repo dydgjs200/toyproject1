@@ -6,7 +6,9 @@ import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { File } from './entities/file.entity';
-const docxConverter = require('docx-pdf');
+import {FileDeleteException, FileNotFoundException} from './file.exception'
+import {UserNotFoundException} from '../user/user.exception'
+import {S3FileNotFoundException} from '../s3/s3.exception'
 
 @Injectable()
 export class FileService {
@@ -29,7 +31,8 @@ export class FileService {
         const user = await this.userService.findOne(userId);
 
         if(!user){
-            throw new UnauthorizedException('유저 인증이 필요합니다')
+            this.logger.error('해당 사용자를 찾을 수 없습니다')
+            throw new UserNotFoundException();
         }
 
         this.logger.log(`file Upload 사용자 확인 완료`);
@@ -69,7 +72,8 @@ export class FileService {
         // DB에서 파일 정보 조회
         const file = await this.fileRepository.findOne({ where: { fileId } });
         if (!file) {
-            throw new NotFoundException('파일을 찾을 수 없습니다.');
+            this.logger.error('파일을 찾을 수 없습니다.')
+            throw new FileNotFoundException()
         }
 
         // S3에서 파일 다운로드
@@ -84,7 +88,8 @@ export class FileService {
         const result = await s3Client.send(command);
         
         if (!result.Body) {
-            throw new NotFoundException('S3에서 파일을 찾을 수 없습니다.');
+            this.logger.error('S3에서 파일을 찾을 수 없습니다.')
+            throw new S3FileNotFoundException();
         }
 
         // 파일 스트림을 버퍼로 변환
@@ -104,8 +109,18 @@ export class FileService {
     async deleteFile(fileId: number) {
         // DB에서 파일 정보 조회
         const file = await this.fileRepository.findOne({ where: { fileId } });
+
+        console.log("delete file > ", file)
+
         if (!file) {
-            throw new NotFoundException('파일을 찾을 수 없습니다.');
+            this.logger.error('파일을 찾을 수 없습니다.')
+            throw new FileNotFoundException()
+        }
+
+        // 시행자와 소유자가 다르면 삭제 불가
+        if (false) {
+            this.logger.error('파일 삭제에 실패했습니다.')
+            throw new FileDeleteException()
         }
 
         // S3에서 파일 삭제
@@ -129,6 +144,8 @@ export class FileService {
             order: { createdAt: 'DESC' }
         });
 
+        console.log("get all file > ", files)
+
         return files.map(file => ({
             fileId: file.fileId,
             url: file.s3Url,
@@ -141,7 +158,8 @@ export class FileService {
     async getFile(fileId: number) {
         const file = await this.fileRepository.findOne({ where: { fileId } });
         if (!file) {
-            throw new NotFoundException('파일을 찾을 수 없습니다.');
+            this.logger.error('파일을 찾을 수 없습니다.')
+            throw new FileNotFoundException();
         }
         return file;
     }
@@ -149,7 +167,8 @@ export class FileService {
     async getMyFile(userId: number) {
         const files = await this.fileRepository.find({ where: { userId } });
         if (!files) {
-            throw new NotFoundException('파일을 찾을 수 없습니다.');
+            this.logger.error('파일을 찾을 수 없습니다.')
+            throw new FileNotFoundException()
         }
         return files;
     }
