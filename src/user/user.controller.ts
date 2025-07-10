@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, Delete, Put, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, Delete, Put, UseGuards, Request, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -34,6 +34,16 @@ export class UserController {
   @ApiOperation({ summary: '사용자 탈퇴', description: 'ID로 사용자가 탈퇴됩니다.' })
   @ApiParam({ name: 'userId', description: '사용자 ID', example: 1 })
   async delete(@Param('userId', ParseIntPipe) userId: number, @Request() req): Promise<void> {
+    try{
+      const user = await this.userService.findOne(userId)
+      console.log("delete user >? ", user)
+
+    }catch(error){
+      if (error instanceof NotFoundException)
+        throw new NotFoundException('해당 유저를 찾을 수 없습니다.')
+      throw error;
+    }
+
     return this.userService.delete(userId);
   }
 
